@@ -1,4 +1,4 @@
-#include "mem.h"
+#include "../include/mem.h"
 
 
 memory_6502 init_new_mem_6502() {
@@ -39,9 +39,9 @@ bool load_bin_to_mem(memory_6502* memory_struct, const uint8_t* opcodes, uint16_
             memory_struct->bits_loaded_to_mem++;
             ram_addr_count++;
         }
-
         return true;
     }
+    return 0;
 }
 
 
