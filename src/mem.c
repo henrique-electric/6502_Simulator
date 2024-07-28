@@ -21,14 +21,14 @@ void memory_write_6502(memory_6502* memory_struct, uint8_t data, uint16_t addr) 
         if (memory_struct->is_addr_free[addr] == true) {
             memory_struct->virtual_memory[addr] = data;
             memory_struct->available_addrs--;
-            sprintf_s(memory_struct->log,256, "0x%x written on addr 0x%x", data, addr);
+            sprintf(memory_struct->log, "0x%x written on addr 0x%x", data, addr);
             memory_struct->is_addr_free[addr] = false;
         }
     }
 }
 
 
-bool load_bin_to_mem(memory_6502* memory_struct, const uint8_t* opcodes, uint16_t bin_size) {
+bool load_bin_to_mem_6502(memory_6502* memory_struct, const uint8_t* opcodes, uint16_t bin_size) {
 
     if (memory_struct != NULL && opcodes != NULL)
     {
@@ -50,12 +50,12 @@ void change_mem6502_addr_state(memory_6502* memory_struct, uint16_t addr, uint8_
         switch (action) {
           case LOCK_ADDR_ACTION:
               memory_struct->is_addr_free[addr] = false;
-              sprintf_s(memory_struct->log,256, "0x%x was lock for written", addr);
+              sprintf(memory_struct->log, "0x%x was lock for written", addr);
               break;
 
           case FREE_ADDR_ACTION:
               memory_struct->is_addr_free[addr] = true;
-              sprintf_s(memory_struct->log,256, "0x%x was free for written", addr);
+              sprintf(memory_struct->log, "0x%x was free for written", addr);
               break;
 
           default:
