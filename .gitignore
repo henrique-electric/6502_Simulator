@@ -1,1 +1,4 @@
 bin/*
+obj/*
+main
+src/main.c
