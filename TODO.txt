@@ -1,0 +1,7 @@
+[CPU]
+    --- Implement the clock on the cpu. (there are some parts done of the clock, but just a few of them)
+    --- Remove the "interpret_6502" function, and create a new one smaller and easy to read
+    --- Think in a way to optmize the fetch function, to handle multibyte instructions and get the arguments of the instructions
+
+[Memory]
+    

@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/electric/Codes/C/6502_Simulator/build/main'
+relocations:     []
+...

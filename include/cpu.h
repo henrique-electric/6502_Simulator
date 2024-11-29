@@ -3,22 +3,36 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <unistd.h>
+
+#define CARRY_BIT                 0   // Indicates the status of the carry bit
+#define ZERO_BIT                  1   // Indicates the some instruction resulted in zero
+#define INT_BIT                   2   // Indicates if the interrupts are enabled
+#define DECIMAL_BIT               3   // Is set to use binary-coded-decimal to easy make base 10 aritmetic
+#define B_FLAG_BIT                4   // 
+#define BIT_1                     5   // Always set to 1, :(
+#define OVERFLOW_BIT              6   // Indicates if a overflow happend on a register
+#define NEGATIVE_BIT              7   // Indicates if a number is negative
+
+#define CPU_CLOCK                 0.0000001
+
+#define TOTAL_NUMBER_INSTRUCTIONS 0xFF
 
 // Data type defines..... just for help on intellisense on vscode
 
 /*
   To makes things simple the names of some registers will be changed to make more easy to comment
   -------------------------------------------------------------------------------------------
-  Accumulator Register		   == A
-  X index Resgister			     == X
-  Y index Register			     == Y
+  Accumulator Register           == A
+  X index Resgister                 == X
+  Y index Register                 == Y
   Stack pointer register(SP) == SP
-  CPU status flag register	 == CF
-  Program Counter register	 == PC
+  CPU status flag register     == CF
+  Program Counter register     == PC
   -------------------------------------------------------------------------------------------
-  Zero Page		    = 0x0000 to 0x00FF
+  Zero Page            = 0x0000 to 0x00FF
   Absolute value  = A value located at any address on the memory
-  Immediate		    = A value which is described after the instruction 
+  Immediate            = A value which is described after the instruction
 
 */
 
@@ -37,7 +51,7 @@ enum load_registers_opcodes{
 
   // X index register LD instructions
   LDX_I   = 0xA2,     // Loads a Immediate value to X register
-  LDX_Z   = 0xA6,     // Loads the value on a address in Zero Page to X register 
+  LDX_Z   = 0xA6,     // Loads the value on a address in Zero Page to X register
   LDX_ZY  = 0xB6,     // Loads the value on a address added to Y register to X register
   LDX_A   = 0xAE,     // Loads a value stored in somewhere in the memory to X register
   LDX_AY  = 0xBE,     // loads a value stored in some address added with Y register to X register
@@ -52,7 +66,6 @@ enum load_registers_opcodes{
 
 // Memory instruction opcodes enum
 enum memory_instruction_opcodes{
-
   PHA     = 0x48,     // Pushes to the stack the value stored on A register
   PLA     = 0x68,     // Pull the value stored on A register
   PHP     = 0x08,     // Pushes to the stack the CF register
@@ -85,7 +98,6 @@ enum flag_register_opcodes{
 
 
 // Logic instuctions opcodes enum
-
 enum logic_instructions_opcodes{
   ROL_A   = 0x2A,
   ROL_Z   = 0x26,
@@ -158,19 +170,36 @@ enum arithmetic_logic_opcodes {
 };
 
 typedef struct CPU {
-	uint8_t      register_a;
-	uint8_t      register_x;
-	uint8_t      register_y;
-	uint8_t      cpu_status;
-	uint8_t      register_sp;
-	uint16_t     pc;
-	memory_6502  memory;
-	uint64_t	 cycle_count;
+    uint8_t      register_a , register_x, register_y, cpu_status, register_sp;
+    uint16_t     pc;
+    memory_6502  memory;
 } CPU;
 
-CPU init_new_cpu();
+void load_immediate_x(CPU  *cpu);
+void load_immediate_y(CPU  *cpu);
+void load_immediate_a(CPU  *cpu);
+void load_absolute_a (CPU  *cpu);
+void load_absolute_x (CPU  *cpu);
+void load_absolute_ax(CPU  *cpu);
+void load_absolute_ay(CPU  *cpu);
+void load_absolute_xy(CPU  *cpu);
+void load_absolute_y (CPU  *cpu);
+void load_absolute_yx(CPU  *cpu);
+void load_zero_page_a(CPU  *cpu);
+void load_zero_page_x(CPU  *cpu);
+void load_zero_page_y(CPU  *cpu);
+
+
+
+
+static void set_up_instruction_array(void);
+static void (*instruction_handler[TOTAL_NUMBER_INSTRUCTIONS])(CPU *cpu);
+static uint8_t fetch_instruction(CPU *cpu);
+CPU init_new_cpu(void);
 bool test_stack(CPU* cpu_ptr);
 void log_CPU_regs(CPU cpu);
 void interpret_6502(CPU* cpu);
-uint16_t cast_uint16_uint8_addrs(uint8_t high_bytes, uint8_t low_bytes); 
+void execute_6502(CPU *cpu);
+uint16_t cast_uint16_uint8_addrs(uint8_t high_bytes, uint8_t low_bytes);
 uint8_t get_op_cycle(uint8_t opcode);
+
