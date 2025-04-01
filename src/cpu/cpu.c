@@ -35,6 +35,16 @@ static void set_up_instruction_array(void) {
     instruction_handler[LDY_A]  = load_absolute_y;
     instruction_handler[LDY_AX] = load_absolute_yx;
     instruction_handler[LDA_Z]  = load_zero_page_a;
+    instruction_handler[LDX_Z]  = load_zero_page_x;
+    instruction_handler[LDY_Z]  = load_zero_page_y;
+    instruction_handler[LDA_ZX] = load_zero_page_ax;
+    instruction_handler[LDX_ZY] = load_zero_page_xy;
+    instruction_handler[LDY_ZX] = load_zero_page_yx;
+
+    instruction_handler[PHA]    = push_register_a;
+    instruction_handler[PLA]    = pull_register_a;
+    instruction_handler[PHP]    = push_flag_reg;
+    instruction_handler[PLP]    = push_flag_reg;
 }
 
 // TODO -> implement clock

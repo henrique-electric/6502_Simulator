@@ -170,24 +170,34 @@ enum arithmetic_logic_opcodes {
 };
 
 typedef struct CPU {
-    uint8_t      register_a , register_x, register_y, cpu_status, register_sp;
+    uint8_t      register_a, register_x, register_y, cpu_status, register_sp;
     uint16_t     pc;
     memory_6502  memory;
 } CPU;
 
-void load_immediate_x(CPU  *cpu);
-void load_immediate_y(CPU  *cpu);
-void load_immediate_a(CPU  *cpu);
-void load_absolute_a (CPU  *cpu);
-void load_absolute_x (CPU  *cpu);
-void load_absolute_ax(CPU  *cpu);
-void load_absolute_ay(CPU  *cpu);
-void load_absolute_xy(CPU  *cpu);
-void load_absolute_y (CPU  *cpu);
-void load_absolute_yx(CPU  *cpu);
-void load_zero_page_a(CPU  *cpu);
-void load_zero_page_x(CPU  *cpu);
-void load_zero_page_y(CPU  *cpu);
+void load_immediate_x (CPU  *cpu);
+void load_immediate_y (CPU  *cpu);
+void load_immediate_a (CPU  *cpu);
+
+void load_absolute_a  (CPU  *cpu);
+void load_absolute_x  (CPU  *cpu);
+void load_absolute_ax (CPU  *cpu);
+void load_absolute_ay (CPU  *cpu);
+void load_absolute_xy (CPU  *cpu);
+void load_absolute_y  (CPU  *cpu);
+void load_absolute_yx (CPU  *cpu);
+
+void load_zero_page_a (CPU  *cpu);
+void load_zero_page_x (CPU  *cpu);
+void load_zero_page_y (CPU  *cpu);
+void load_zero_page_ax(CPU  *cpu);
+void load_zero_page_xy(CPU  *cpu);
+void load_zero_page_yx(CPU  *cpu);
+
+void push_register_a  (CPU  *cpu);
+void pull_register_a  (CPU  *cpu);
+void push_flag_reg    (CPU  *cpu);
+void pull_flag_reg    (CPU  *cpu);
 
 
 

@@ -2,3 +2,8 @@ bin/*
 obj/*
 main
 src/main.c
+build/*
+*.o
+*.vscode
+.clangd
+6502.xcodeproj
