@@ -3,7 +3,7 @@ obj/*
 main
 src/main.c
 build/*
-*.o
-*.vscode
+./*.o
+.vscode
 .clangd
 6502.xcodeproj
