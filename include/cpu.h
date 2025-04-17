@@ -5,14 +5,14 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define CARRY_BIT                 0   // Indicates the status of the carry bit
-#define ZERO_BIT                  1   // Indicates the some instruction resulted in zero
-#define INT_BIT                   2   // Indicates if the interrupts are enabled
-#define DECIMAL_BIT               3   // Is set to use binary-coded-decimal to easy make base 10 aritmetic
-#define B_FLAG_BIT                4   // 
-#define BIT_1                     5   // Always set to 1, :(
-#define OVERFLOW_BIT              6   // Indicates if a overflow happend on a register
-#define NEGATIVE_BIT              7   // Indicates if a number is negative
+#define CARRY_BIT                 (1 << 0)   // Indicates the status of the carry bit
+#define ZERO_BIT                  (1 << 1)   // Indicates the some instruction resulted in zero
+#define INT_BIT                   (1 << 2)   // Indicates if the interrupts are enabled
+#define DECIMAL_BIT               (1 << 3)   // Is set to use binary-coded-decimal to easy make base 10 aritmetic
+#define B_FLAG_BIT                (1 << 4)   //
+#define BIT_1                     (1 << 5) // Always set to 1, :(
+#define OVERFLOW_BIT              (1 << 6)   // Indicates if a overflow happend on a register
+#define NEGATIVE_BIT              (1 << 7)   // Indicates if a number is negative
 
 #define CPU_CLOCK                 0.0000001
 
@@ -24,16 +24,18 @@
   To makes things simple the names of some registers will be changed to make more easy to comment
   -------------------------------------------------------------------------------------------
   Accumulator Register           == A
-  X index Resgister                 == X
-  Y index Register                 == Y
-  Stack pointer register(SP) == SP
-  CPU status flag register     == CF
-  Program Counter register     == PC
+  X index Resgister              == X
+  Y index Register               == Y
+  Stack pointer register(SP)     == SP
+  CPU status flag register       == CF
+  Program Counter register       == PC
   -------------------------------------------------------------------------------------------
   Zero Page            = 0x0000 to 0x00FF
   Absolute value  = A value located at any address on the memory
   Immediate            = A value which is described after the instruction
-
+ 
+ "lsb_storage" is used to store least significant bytes
+ "msb_storage" is used to store high significant bytes
 */
 
 // Load instruction constants opcodes
@@ -169,9 +171,12 @@ enum arithmetic_logic_opcodes {
   ASL_ABX = 0x1E
 };
 
+
+
 typedef struct CPU {
-    uint8_t      register_a, register_x, register_y, cpu_status, register_sp;
+    uint8_t      register_a, register_x, register_y, cpu_status, register_sp, register_ir, lsb_storage, msb_storage;
     uint16_t     pc;
+    int clock_count;
     memory_6502  memory;
 } CPU;
 
@@ -202,9 +207,9 @@ void pull_flag_reg    (CPU  *cpu);
 
 
 
-static void set_up_instruction_array(void);
-static void (*instruction_handler[TOTAL_NUMBER_INSTRUCTIONS])(CPU *cpu);
-static uint8_t fetch_instruction(CPU *cpu);
+void set_up_instruction_array(void);
+void (*instruction_handler[TOTAL_NUMBER_INSTRUCTIONS])(CPU *cpu);
+void fetch_instruction(CPU *cpu);
 CPU init_new_cpu(void);
 bool test_stack(CPU* cpu_ptr);
 void log_CPU_regs(CPU cpu);

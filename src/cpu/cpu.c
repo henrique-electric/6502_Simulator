@@ -23,7 +23,7 @@ uint16_t cast_uint16_uint8_addrs(uint8_t high_bytes, uint8_t low_bytes) {
 }
 
 
-static void set_up_instruction_array(void) {
+void set_up_instruction_array(void) {
     instruction_handler[LDX_I]  = load_immediate_x;
     instruction_handler[LDY_I]  = load_immediate_y;
     instruction_handler[LDA_I]  = load_immediate_a;
@@ -48,181 +48,26 @@ static void set_up_instruction_array(void) {
 }
 
 // TODO -> implement clock
-uint8_t fetch_instruction(CPU *cpu) {
+void fetch_instruction(CPU *cpu) {
     if (cpu == NULL)
-        return 0x0000;
+        return;
     
-    return memory_read_6502(&cpu->memory, cpu->pc);
+    cpu->register_ir = memory_read_6502(&cpu->memory, cpu->pc);
+    cpu->pc++;
+    
 }
 
 void execute_6502(CPU *cpu) {
     if (cpu != NULL) {
-        uint8_t current_instruction = fetch_instruction(cpu);
-        usleep(1);
-        instruction_handler[current_instruction](cpu);
+        fetch_instruction(cpu);
+        cpu->clock_count++;
+        instruction_handler[cpu->register_ir](cpu);
     }
 }
-
-// TODO -> #REMOVE THIS FUNCTION
-/*
-void interpret_6502(CPU* cpu_ptr) {
-    if (cpu_ptr != NULL) {
-        uint8_t opcode           = 0x00;
-        uint8_t arg1             = 0x00;
-        uint8_t arg2             = 0x00;
-        uint8_t arg3             = 0x00;
-        uint16_t absolute_value  = 0x0000;
-        for (uint16_t count = 0; count < cpu_ptr->memory.bits_loaded_to_mem; count++) {
-
-            opcode = cpu_ptr->pc; 
-            switch (opcode) {
-                case LDA_I:
-                    cpu_ptr->register_a = (cpu_ptr->pc & 0x00FF); // Gets the lower bits from the instruction, because the instruction needs a argument
-                    cpu_ptr->pc++;
-                    usleep(1);
-                    break;
-
-                case LDA_AB:
-                    cpu_ptr->register_a = memory_read_6502(cpu_ptr->memory, absolute_value);
-                    break;
-
-                case LDA_AX:
-                    cpu_ptr->register_a = memory_read_6502(cpu_ptr->memory, absolute_value + (uint16_t) cpu_ptr->register_x);
-                    break;
-
-                case LDA_AY:
-                    cpu_ptr->register_a = memory_read_6502(cpu_ptr->memory, absolute_value + (uint16_t) cpu_ptr->register_y);
-                    break;
-
-                case LDX_I:
-                    cpu_ptr->register_x = arg1;
-                    break;
-
-                case LDY_I:
-                    cpu_ptr->register_y = arg1;
-                    break;
-
-                case INX:
-                    cpu_ptr->register_x++;
-                    break;
-
-                case INY:
-                    cpu_ptr->register_y++;
-                    break;
-                    
-                case CLC:
-                    cpu_ptr->cpu_status &= ~(1 << CARRY_BIT);
-                    break;
-                    
-                case SEC:
-                    cpu_ptr->cpu_status |= (1 << CARRY_BIT);
-                    break;
-                    
-                case CLI:
-                    cpu_ptr->cpu_status &= ~(1 << INT_BIT);
-                    cpu_ptr->pc++;
-                    break;
-                
-                case SEI:
-                    cpu_ptr->cpu_status |= (1 << INT_BIT);
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case CLV:
-                    cpu_ptr->cpu_status &= ~(1 << OVERFLOW_BIT);
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case CLD:
-                    cpu_ptr->cpu_status &= ~(1 << DECIMAL_BIT);
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case SED:
-                    cpu_ptr->cpu_status |= (1 << DECIMAL_BIT);
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case PHA:
-                    
-                    if (!test_stack(cpu_ptr)) {
-                        memory_write_6502(&cpu_ptr->memory, cpu_ptr->register_a, (uint16_t) cpu_ptr->register_sp);
-                        cpu_ptr->register_sp--;
-                        cpu_ptr->pc++;
-                    }
-                    break;
-                    
-                case PLA:
-                    
-                    if (!test_stack(cpu_ptr)) {
-                        cpu_ptr->register_a = memory_read_6502(cpu_ptr->memory, (uint16_t) cpu_ptr->register_sp);
-                        change_mem6502_addr_state(&cpu_ptr->memory, (uint16_t) cpu_ptr->register_sp, FREE_ADDR_ACTION);
-                        cpu_ptr->register_sp++;
-                        cpu_ptr->pc++;
-                    }
-                    break;
-                
-                case PHP:
-                    
-                    if (!test_stack(cpu_ptr)) {
-                        memory_write_6502(&cpu_ptr->memory, cpu_ptr->cpu_status, (uint16_t) cpu_ptr->register_sp);
-                        cpu_ptr->register_sp--;
-                        cpu_ptr->pc++;
-                    }
-                    break;
-                    
-                case PLP:
-                    
-                    if (!test_stack(cpu_ptr)) {
-                        cpu_ptr->cpu_status = memory_read_6502(cpu_ptr->memory, (uint16_t) cpu_ptr->register_sp);
-                        change_mem6502_addr_state(&cpu_ptr->memory, (uint16_t) cpu_ptr->register_sp, FREE_ADDR_ACTION);
-                        cpu_ptr->register_sp++;
-                        cpu_ptr->pc++;
-                    }
-                    break;
-                    
-                case TAX:
-                    cpu_ptr->register_x = cpu_ptr->register_a;
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case TAY:
-                    cpu_ptr->register_y = cpu_ptr->register_a;
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case TXA:
-                    cpu_ptr->register_a = cpu_ptr->register_x;
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case TYA:
-                    cpu_ptr->register_a = cpu_ptr->register_y;
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case TXS:
-                    cpu_ptr->register_sp = cpu_ptr->register_x;
-                    cpu_ptr->pc++;
-                    break;
-                    
-                case TSX:
-                    cpu_ptr->register_x = cpu_ptr->register_sp;
-                    cpu_ptr->pc++;
-                    break;
-            default:
-                break;
-            }
-
-        }
-    }
-}
-*/
 
 bool test_stack(CPU* cpu_ptr)
 {
-    if (cpu_ptr->register_sp == STACK_START_ADDR_6502)
-    {
+    if (cpu_ptr->register_sp == STACK_END_ADDR_6502) {
         cpu_ptr->memory.is_stack_full = true;
         return true;
     }

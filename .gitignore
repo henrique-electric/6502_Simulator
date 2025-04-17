@@ -7,3 +7,4 @@ build/*
 .vscode
 .clangd
 6502.xcodeproj
+.DS_Store
