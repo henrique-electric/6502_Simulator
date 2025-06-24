@@ -2,7 +2,7 @@ bin/*
 obj/*
 main
 src/main.c
-build/*
+build
 ./*.o
 .vscode
 .clangd
