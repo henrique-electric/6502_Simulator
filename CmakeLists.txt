@@ -1,0 +1,4 @@
+cmake_minimum_required(VERSION 4.0.3)
+project(6502_Simulator)
+
+add_library(${PROJECT_NAME} src/cpu/cpu.c src/cpu/instructions.c src/mem.c)
